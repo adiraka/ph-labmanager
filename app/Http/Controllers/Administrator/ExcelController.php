@@ -5,6 +5,7 @@ namespace Labmanager\Http\Controllers\Administrator;
 use Excel;
 use Illuminate\Http\Request;
 use Labmanager\Http\Controllers\Controller;
+use Labmanager\Models\Pasien;
 use Labmanager\Models\Periksa;
 use Labmanager\Models\Kuisioner;
 use Carbon\Carbon;
@@ -12,21 +13,117 @@ use DB;
 
 class ExcelController extends Controller
 {
+
+    public function LaporanDataPasien() {
+
+        set_time_limit(300);
+
+        return Excel::create('PH-MDRTB PATIENT REPORT', function($excel) {
+
+            $excel->sheet('PASIEN', function($sheet) {
+
+                $listPasien = Pasien::all()->sortBy('idtb');
+
+                $sheet->setPaperSize(5);
+    			$sheet->setOrientation('portrait');
+    			$sheet->setPageMargin(0.25);
+                $sheet->setScale(60);
+
+                $sheet->mergeCells('A1:L1');
+    			$sheet->mergeCells('A2:L2');
+
+                $sheet->cell('A1', function($cell) {
+    				$cell->setValue('Laporan Data Pasien Peerhealth MDRTB');
+    				$cell->setFontSize(12);
+    				$cell->setFontWeight('bold');
+    				$cell->setAlignment('center');
+    			});
+
+                $sheet->cell('A2', function($cell) {
+    				$cell->setValue('Research Conducted by Dr. dr. Andani Eka Putra, M.Sc');
+    				$cell->setFontSize(10);
+    				$cell->setFontWeight('bold');
+    				$cell->setAlignment('center');
+    			});
+
+                $sheet->appendRow(4, array(
+    				'NO', 'IDTB', 'IDPP', 'NAMA PASIEN', 'TGL LAHIR', 'TGL DAFTAR', 'UMUR', 'SEX', 'ALAMAT', 'INSTANSI ASAL', 'KUISIONER', 'ENUMERATOR'
+    			));
+
+                $sheet->setFreeze('A5');
+                
+                $nomor = 1;
+                $dataRow = 5;
+
+                foreach($listPasien as $key => $value) {
+
+                    $sheet->cell('A'.$dataRow, function($cell) use($nomor) { $cell->setValue($nomor); });
+                    $sheet->cell('B'.$dataRow, function($cell) use($value) { $cell->setValue($value->idtb); });
+                    $sheet->cell('C'.$dataRow, function($cell) use($value) { $cell->setValue($value->idpp); });
+                    $sheet->cell('D'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->nama_pasien)); });
+                    $sheet->cell('E'.$dataRow, function($cell) use($value) { $cell->setValue($value->tgl_lahir); });
+                    $sheet->cell('F'.$dataRow, function($cell) use($value) { $cell->setValue($value->tgl_daftar); });
+                    $sheet->cell('G'.$dataRow, function($cell) use($value) { $cell->setValue($value->umur); });
+                    $sheet->cell('H'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->sex)); });
+                    $sheet->cell('I'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->alamat)); });
+                    $sheet->cell('J'.$dataRow, function($cell) use($value) {
+                        $cell->setValue(
+                            strtoupper($value->instansi->nama_instansi).' - '.strtoupper($value->instansi->daerah->nama_daerah)
+                        );
+                    });
+                    $sheet->cell('K'.$dataRow, function($cell) use($value) { $cell->setValue(($value->kuisioner == 1) ? "ADA" : "TIDAK"); });
+                    $sheet->cell('L'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->enumerator)); });
+
+                    $nomor = $nomor + 1;
+                    $dataRow = $dataRow + 1;
+
+                }
+
+                $sheet->cells('A4:L4', function($cells) {
+    				$cells->setAlignment('center');
+    				$cells->setValignment('center');
+    				$cells->setFontWeight('bold');
+    				$cells->setFontSize(9);
+    			});
+
+                $sheet->cells('A5:L'.($dataRow-1), function($cells) {
+    				// $cells->setAlignment('left');
+    				$cells->setValignment('center');
+    				// $cells->setFontWeight('bold');
+    				$cells->setFontSize(8);
+    			});
+
+                $sheet->cells('A5:C'.($dataRow-1), function($cells) {
+    				$cells->setAlignment('center');
+    			});
+
+                $sheet->setBorder('A4:L'.($dataRow-1), 'thin');
+
+                $sheet->setWidth(array(
+                    'A' => 5, 'B' => 15, 'C' => 12, 'D' => 22, 'E' => 10, 'F' => 10, 'G' => 5, 'H' => 7, 'I' => 30,
+                    'I' => 25, 'J' => 25, 'K' => 10, 'L' => 15
+                ));
+
+            });
+
+        })->download('xls');
+
+    }
+
     public function LaporanSampelPasienExcel() {
 
         set_time_limit(300);
 
-    	return Excel::create('Laporan Sampel Pasien', function($excel) {
+    	return Excel::create('PH-MDRTB SAMPLE REPORT', function($excel) {
 
-    		$listPeriksa = Periksa::all();
+    		$excel->sheet('KESELURUHAN', function($sheet) {
 
-    		$excel->sheet('Laporan', function($sheet) use($listPeriksa) {
+                $listPeriksa = Periksa::all()->sortBy('idtb');
 
     			$dataRow = 5;
 
     			$sheet->setPaperSize(5);
     			$sheet->setOrientation('landscape');
-    			// $sheet->setScale(80);
     			$sheet->setPageMargin(0.25);
 
     			$sheet->setFreeze('A5');
@@ -35,14 +132,14 @@ class ExcelController extends Controller
     			$sheet->mergeCells('A2:O2');
 
     			$sheet->cell('A1', function($cell) {
-    				$cell->setValue('Laporan Data Sample Pasien Peerhealth MDRTB');
+    				$cell->setValue('Laporan Keseluruhan Data Sample Pasien Peerhealth MDRTB');
     				$cell->setFontSize(12);
     				$cell->setFontWeight('bold');
     				$cell->setAlignment('center');
     			});
 
     			$sheet->cell('A2', function($cell) {
-    				$cell->setValue('Jl. Perintis Kemerdekaan, Jati baru, Padang Timur');
+    				$cell->setValue('Research Conducted by Dr. dr. Andani Eka Putra, M.Sc');
     				$cell->setFontSize(10);
     				$cell->setFontWeight('bold');
     				$cell->setAlignment('center');
@@ -52,9 +149,11 @@ class ExcelController extends Controller
     				'NO', 'IDTB', 'IDPP', 'NAMA PASIEN', 'GENDER', 'UMUR', 'JNS INSTANSI', 'NAMA INSTANSI', 'PEMERIKSAAN KE', 'TGL MASUK', 'TGL PERIKSA', 'JNS SAMPEL', 'RESISTENSI', 'HASIL', 'RIFF'
     			));
 
+                $nomor = 1;
+
     			foreach ($listPeriksa as $key => $value) {
     				
-    				$sheet->cell('A'.$dataRow, function($cell) use($key) { $cell->setValue($key+1); });
+    				$sheet->cell('A'.$dataRow, function($cell) use($nomor) { $cell->setValue($nomor); });
     				$sheet->cell('B'.$dataRow, function($cell) use($value) { $cell->setValue($value->idtb); });
     				$sheet->cell('C'.$dataRow, function($cell) use($value) { $cell->setValue($value->idpp); });
     				$sheet->cell('D'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->pasien->nama_pasien)); });
@@ -70,6 +169,161 @@ class ExcelController extends Controller
     				$sheet->cell('N'.$dataRow, function($cell) use($value) { $cell->setValue($value->hasil); });
     				$sheet->cell('O'.$dataRow, function($cell) use($value) { $cell->setValue($value->rif); });
 
+                    $nomor = $nomor + 1;
+    				$dataRow = $dataRow + 1;
+
+    			}
+
+    			$sheet->cells('A4:O4', function($cells) {
+    				$cells->setAlignment('center');
+    				$cells->setValignment('center');
+    				$cells->setFontWeight('bold');
+    				$cells->setFontSize(9);
+    			});
+
+    			$sheet->cells('A5:O'.($dataRow-1), function($cells) {
+    				$cells->setAlignment('left');
+    				$cells->setValignment('center');
+    				// $cells->setFontWeight('bold');
+    				$cells->setFontSize(8);
+    			});
+
+    			$sheet->setAutoSize(true);
+    			$sheet->setBorder('A4:O'.($dataRow-1), 'thin');
+
+    		});
+
+            $excel->sheet('POSITIF', function($sheet) {
+
+                $listPeriksa = Periksa::all()->where('hasil', 'TB Positif')->sortBy('idtb');
+
+    			$dataRow = 5;
+
+    			$sheet->setPaperSize(5);
+    			$sheet->setOrientation('landscape');
+    			$sheet->setPageMargin(0.25);
+
+    			$sheet->setFreeze('A5');
+
+    			$sheet->mergeCells('A1:O1');
+    			$sheet->mergeCells('A2:O2');
+
+    			$sheet->cell('A1', function($cell) {
+    				$cell->setValue('Laporan Data Sample Positif Pasien Peerhealth MDRTB');
+    				$cell->setFontSize(12);
+    				$cell->setFontWeight('bold');
+    				$cell->setAlignment('center');
+    			});
+
+    			$sheet->cell('A2', function($cell) {
+    				$cell->setValue('Research Conducted by Dr. dr. Andani Eka Putra, M.Sc');
+    				$cell->setFontSize(10);
+    				$cell->setFontWeight('bold');
+    				$cell->setAlignment('center');
+    			});
+
+    			$sheet->appendRow(4, array(
+    				'NO', 'IDTB', 'IDPP', 'NAMA PASIEN', 'GENDER', 'UMUR', 'JNS INSTANSI', 'NAMA INSTANSI', 'PEMERIKSAAN KE', 'TGL MASUK', 'TGL PERIKSA', 'JNS SAMPEL', 'RESISTENSI', 'HASIL', 'RIFF'
+    			));
+
+                $nomor = 1;
+
+    			foreach ($listPeriksa as $key => $value) {
+    				
+    				$sheet->cell('A'.$dataRow, function($cell) use($nomor) { $cell->setValue($nomor); });
+    				$sheet->cell('B'.$dataRow, function($cell) use($value) { $cell->setValue($value->idtb); });
+    				$sheet->cell('C'.$dataRow, function($cell) use($value) { $cell->setValue($value->idpp); });
+    				$sheet->cell('D'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->pasien->nama_pasien)); });
+    				$sheet->cell('E'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->pasien->sex)); });
+    				$sheet->cell('F'.$dataRow, function($cell) use($value) { $cell->setValue($value->pasien->umur); });
+    				$sheet->cell('G'.$dataRow, function($cell) use($value) { $cell->setValue($value->pasien->instansi->jenisinstansi->nama_jenis_instansi); });
+    				$sheet->cell('H'.$dataRow, function($cell) use($value) { $cell->setValue($value->pasien->instansi->nama_instansi); });
+    				$sheet->cell('I'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->pemeriksaan_ke)); });
+    				$sheet->cell('J'.$dataRow, function($cell) use($value) { $cell->setValue($value->tgl_masuk_sampel->format('d-m-Y')); });
+    				$sheet->cell('K'.$dataRow, function($cell) use($value) { $cell->setValue($value->tgl_periksa->format('d-m-Y')); });
+    				$sheet->cell('L'.$dataRow, function($cell) use($value) { $cell->setValue($value->jns_sampel); });
+    				$sheet->cell('M'.$dataRow, function($cell) use($value) { $cell->setValue($value->jns_resistensi); });
+    				$sheet->cell('N'.$dataRow, function($cell) use($value) { $cell->setValue($value->hasil); });
+    				$sheet->cell('O'.$dataRow, function($cell) use($value) { $cell->setValue($value->rif); });
+
+                    $nomor = $nomor + 1;
+    				$dataRow = $dataRow + 1;
+
+    			}
+
+    			$sheet->cells('A4:O4', function($cells) {
+    				$cells->setAlignment('center');
+    				$cells->setValignment('center');
+    				$cells->setFontWeight('bold');
+    				$cells->setFontSize(9);
+    			});
+
+    			$sheet->cells('A5:O'.($dataRow-1), function($cells) {
+    				$cells->setAlignment('left');
+    				$cells->setValignment('center');
+    				// $cells->setFontWeight('bold');
+    				$cells->setFontSize(8);
+    			});
+
+    			$sheet->setAutoSize(true);
+    			$sheet->setBorder('A4:O'.($dataRow-1), 'thin');
+
+    		});
+
+            $excel->sheet('NEGATIF', function($sheet) {
+
+                $listPeriksa = Periksa::all()->where('hasil', 'TB Negatif')->sortBy('idtb');
+
+    			$dataRow = 5;
+
+    			$sheet->setPaperSize(5);
+    			$sheet->setOrientation('landscape');
+    			$sheet->setPageMargin(0.25);
+
+    			$sheet->setFreeze('A5');
+
+    			$sheet->mergeCells('A1:O1');
+    			$sheet->mergeCells('A2:O2');
+
+    			$sheet->cell('A1', function($cell) {
+    				$cell->setValue('Laporan Data Sample Negatif Pasien Peerhealth MDRTB');
+    				$cell->setFontSize(12);
+    				$cell->setFontWeight('bold');
+    				$cell->setAlignment('center');
+    			});
+
+    			$sheet->cell('A2', function($cell) {
+    				$cell->setValue('Research Conducted by Dr. dr. Andani Eka Putra, M.Sc');
+    				$cell->setFontSize(10);
+    				$cell->setFontWeight('bold');
+    				$cell->setAlignment('center');
+    			});
+
+    			$sheet->appendRow(4, array(
+    				'NO', 'IDTB', 'IDPP', 'NAMA PASIEN', 'GENDER', 'UMUR', 'JNS INSTANSI', 'NAMA INSTANSI', 'PEMERIKSAAN KE', 'TGL MASUK', 'TGL PERIKSA', 'JNS SAMPEL', 'RESISTENSI', 'HASIL', 'RIFF'
+    			));
+
+                $nomor = 1;
+
+    			foreach ($listPeriksa as $key => $value) {
+    				
+    				$sheet->cell('A'.$dataRow, function($cell) use($nomor) { $cell->setValue($nomor); });
+    				$sheet->cell('B'.$dataRow, function($cell) use($value) { $cell->setValue($value->idtb); });
+    				$sheet->cell('C'.$dataRow, function($cell) use($value) { $cell->setValue($value->idpp); });
+    				$sheet->cell('D'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->pasien->nama_pasien)); });
+    				$sheet->cell('E'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->pasien->sex)); });
+    				$sheet->cell('F'.$dataRow, function($cell) use($value) { $cell->setValue($value->pasien->umur); });
+    				$sheet->cell('G'.$dataRow, function($cell) use($value) { $cell->setValue($value->pasien->instansi->jenisinstansi->nama_jenis_instansi); });
+    				$sheet->cell('H'.$dataRow, function($cell) use($value) { $cell->setValue($value->pasien->instansi->nama_instansi); });
+    				$sheet->cell('I'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->pemeriksaan_ke)); });
+    				$sheet->cell('J'.$dataRow, function($cell) use($value) { $cell->setValue($value->tgl_masuk_sampel->format('d-m-Y')); });
+    				$sheet->cell('K'.$dataRow, function($cell) use($value) { $cell->setValue($value->tgl_periksa->format('d-m-Y')); });
+    				$sheet->cell('L'.$dataRow, function($cell) use($value) { $cell->setValue($value->jns_sampel); });
+    				$sheet->cell('M'.$dataRow, function($cell) use($value) { $cell->setValue($value->jns_resistensi); });
+    				$sheet->cell('N'.$dataRow, function($cell) use($value) { $cell->setValue($value->hasil); });
+    				$sheet->cell('O'.$dataRow, function($cell) use($value) { $cell->setValue($value->rif); });
+
+                    $nomor = $nomor + 1;
     				$dataRow = $dataRow + 1;
 
     			}
@@ -292,7 +546,12 @@ class ExcelController extends Controller
 
         return Excel::create('Laporan Kuisioner', function($excel) {
 
-            $listKuisioner = Kuisioner::all();
+            // $listKuisioner = Kuisioner::all();
+            $listKuisioner = DB::table('kuisioner')
+                                ->join('pasien', 'pasien.id', '=', 'kuisioner.pasien_id')
+                                ->select('kuisioner.*', 'pasien.idtb', 'pasien.nama_pasien', 'pasien.sex', 'pasien.umur', 'pasien.enumerator')
+                                ->orderBy('pasien.idtb', 'asc')
+                                ->get();
 
             $excel->sheet('Laporan', function($sheet) use($listKuisioner) {
 
@@ -349,11 +608,11 @@ class ExcelController extends Controller
                 foreach ($listKuisioner as $key => $value) {
                     
                     $sheet->cell('A'.$dataRow, function($cell) use($key) { $cell->setValue($key+1); });
-                    $sheet->cell('B'.$dataRow, function($cell) use($value) { $cell->setValue($value->pasien->idtb); });
-                    $sheet->cell('C'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->pasien->nama_pasien)); });
-                    $sheet->cell('D'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->pasien->sex)); });
-                    $sheet->cell('E'.$dataRow, function($cell) use($value) { $cell->setValue($value->pasien->umur); });
-                    $sheet->cell('F'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->pasien->enumerator)); });
+                    $sheet->cell('B'.$dataRow, function($cell) use($value) { $cell->setValue($value->idtb); });
+                    $sheet->cell('C'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->nama_pasien)); });
+                    $sheet->cell('D'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->sex)); });
+                    $sheet->cell('E'.$dataRow, function($cell) use($value) { $cell->setValue($value->umur); });
+                    $sheet->cell('F'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->enumerator)); });
                     $sheet->cell('G'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->k1)); });
                     $sheet->cell('H'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->k2)); });
                     $sheet->cell('I'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->k3)); });
@@ -441,7 +700,7 @@ class ExcelController extends Controller
                     $sheet->cell('CM'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->k71)); });
                     $sheet->cell('CN'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->k72)); });
                     $sheet->cell('CO'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->k73)); });
-                    $sheet->cell('CP'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->k74b)); });
+                    $sheet->cell('CP'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->k74)); });
                     $sheet->cell('CQ'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->k75a)); });
                     $sheet->cell('CR'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->k75b)); });
                     $sheet->cell('CS'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->k76)); });

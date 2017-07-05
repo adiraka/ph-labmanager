@@ -45,8 +45,8 @@ Route::group(['prefix'=>'administrator','middleware'=>['auth','administrator']],
 //Excel
 	// Route::get('/excel/daerah/{jenis}','Administrator\DaerahExcelController@getExcelDaerah');
 	// Route::get('/excel/instansi/{jenis}','Administrator\InstansiExcelController@getExcelInstansi');
-	Route::get('/excel/pasien/{id?}','Excel\ExcelPasienController@getExcelPasien');
-	Route::get('/excel/bulan/{bln?}/{thn?}','Excel\ExcelBulanController@getExcelBulanan');
+	// Route::get('/excel/pasien/{id?}','Excel\ExcelPasienController@getExcelPasien');
+	// Route::get('/excel/bulan/{bln?}/{thn?}','Excel\ExcelBulanController@getExcelBulanan');
 	// Route::get('/excel/periksa/{jenis}','Administrator\PeriksaExcelController@getExcelPeriksa');
 
 //Chart
@@ -110,6 +110,7 @@ Route::group(['prefix'=>'administrator','middleware'=>['auth','administrator']],
 	Route::post('/kuisioner/delete', ['as'=>'adm.postdeletekuisioner','uses'=>'Administrator\KuisionerController@postDeleteKuisioner']);
 
 // Excel
+	Route::get('/excel/pasien', ['as' => 'adm.excel.pasien', 'uses' => 'Administrator\ExcelController@LaporanDataPasien']);
 	Route::get('/excel/sampel', ['as' => 'adm.excel.sampel', 'uses' => 'Administrator\ExcelController@LaporanSampelPasienExcel']);
 	Route::get('/excel/keseluruhan', ['as' => 'adm.excel.keseluruhan', 'uses' => 'Administrator\ExcelController@LaporanKeseluruhanExcel']);
 	Route::get('/excel/kuisioner', ['as' => 'adm.excel.kuisioner', 'uses' => 'Administrator\ExcelController@LaporanKuisionerExcel']);

@@ -124,9 +124,11 @@
 								<span>Print</span>
 							</button>
 							<div class="btn-group m-l-20" role="group">
-								<button type="button" class="btn btn-lg bg-deep-purple waves-effect font-bold" data-toggle="modal" data-target="#largeModal">
-									<span>PDF</span>
-								</button>
+								<a href="{{ route('adm.excel.pasien') }}">
+									<button type="button" class="btn btn-lg bg-deep-purple waves-effect font-bold" data-toggle="modal" data-target="#largeModal">
+										<span>PDF</span>
+									</button>
+								</a>
 								<button type="button" class="btn btn-lg bg-purple waves-effect font-bold" data-toggle="modal" data-target="#largeModal">
 									<span>Excel</span>
 								</button>
