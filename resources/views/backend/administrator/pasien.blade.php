@@ -119,19 +119,18 @@
 						</li>
 						<li class="m-t-20">
 							<span class="font-bold font-15">Report</span>
-							<p class="m-b-20 font-12">Cetak Report atau Eksport ke PDF dan Excel</p>
-							<button type="button" class="btn btn-lg bg-indigo waves-effect" data-toggle="modal" data-target="#largeModal" onclick="$.AdminBSB.notif.show('asdasdasdasdasd','asdadasdasdasdasdadasda');">
-								<span>Print</span>
-							</button>
+							<p class="m-b-20 font-12">Export Laporan Pasien ke Excel</p>
 							<div class="btn-group m-l-20" role="group">
 								<a href="{{ route('adm.excel.pasien') }}">
-									<button type="button" class="btn btn-lg bg-deep-purple waves-effect font-bold" data-toggle="modal" data-target="#largeModal">
-										<span>PDF</span>
+									<button type="button" class="btn btn-lg bg-deep-purple waves-effect font-bold">
+										<span>Full Report</span>
 									</button>
 								</a>
-								<button type="button" class="btn btn-lg bg-purple waves-effect font-bold" data-toggle="modal" data-target="#largeModal">
-									<span>Excel</span>
-								</button>
+								<a href="{{ route('adm.excel.pasien.noage') }}">
+									<button type="button" class="btn btn-lg bg-purple waves-effect font-bold">
+										<span>No Umur</span>
+									</button>
+								</a>
 							</div>
 						</li>
 					</ul>

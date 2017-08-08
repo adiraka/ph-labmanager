@@ -119,17 +119,21 @@
 						</li>
 						<li class="m-t-20">
 							<span class="font-bold font-15">Report</span>
-							<p class="m-b-20 font-12">Cetak Report atau Eksport ke PDF dan Excel</p>
-							<button type="button" class="btn btn-lg bg-indigo waves-effect" data-toggle="modal" data-target="#largeModal" onclick="$.AdminBSB.notif.show('asdasdasdasdasd','asdadasdasdasdasdadasda');">
-								<span>Print</span>
-							</button>
+							<p class="m-b-20 font-12">Export Laporan Sampel ke Excel</p>
 							<div class="btn-group m-l-20" role="group">
-								<button type="button" class="btn btn-lg bg-deep-purple waves-effect font-bold" data-toggle="modal" data-target="#largeModal">
-									<span>PDF</span>
-								</button>
-								<a href="{{ route('adm.excel.sampel') }}">
-									<button type="button" class="btn btn-lg bg-purple waves-effect font-bold" data-toggle="modal" data-target="#largeModal">
-										<span>Excel</span>
+								<a href="{{ route('adm.excel.sampel.ge') }}">
+									<button type="button" class="btn btn-lg bg-deep-purple waves-effect font-bold">
+										<span>GE</span>
+									</button>
+								</a>
+								<a href="">
+									<button type="button" class="btn btn-lg bg-indigo waves-effect">
+										<span>KLTR</span>
+									</button>
+								</a>
+								<a href="{{ route('adm.excel.sampel.bta') }}">
+									<button type="button" class="btn btn-lg bg-purple waves-effect font-bold">
+										<span>BTA</span>
 									</button>
 								</a>
 							</div>

@@ -111,8 +111,15 @@ Route::group(['prefix'=>'administrator','middleware'=>['auth','administrator']],
 
 // Excel
 	Route::get('/excel/pasien', ['as' => 'adm.excel.pasien', 'uses' => 'Administrator\ExcelController@LaporanDataPasien']);
+	Route::get('/excel/pasiennoage', ['as' => 'adm.excel.pasien.noage', 'uses' => 'Administrator\ExcelController@LaporanDataPasienNoUmur']);
+	
 	Route::get('/excel/sampel', ['as' => 'adm.excel.sampel', 'uses' => 'Administrator\ExcelController@LaporanSampelPasienExcel']);
+	Route::get('/excel/sampelbta', ['as' => 'adm.excel.sampel.bta', 'uses' => 'Administrator\ExcelController@LaporanSampelBTA']);
+	Route::get('/excel/sampelge', ['as' => 'adm.excel.sampel.ge', 'uses' => 'Administrator\ExcelController@LaporanSampelGE']);
+	Route::get('/excel/sampelkltr', ['as' => 'adm.excel.sampel.kltr', 'uses' => 'Administrator\ExcelController@LaporanSampelKLTR']);
+	
 	Route::get('/excel/keseluruhan', ['as' => 'adm.excel.keseluruhan', 'uses' => 'Administrator\ExcelController@LaporanKeseluruhanExcel']);
+	
 	Route::get('/excel/kuisioner', ['as' => 'adm.excel.kuisioner', 'uses' => 'Administrator\ExcelController@LaporanKuisionerExcel']);
 
 });
