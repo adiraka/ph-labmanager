@@ -126,7 +126,7 @@
 										<span>GE</span>
 									</button>
 								</a>
-								<a href="">
+								<a href="{{ route('adm.excel.sampel.kltr') }}">
 									<button type="button" class="btn btn-lg bg-indigo waves-effect">
 										<span>KLTR</span>
 									</button>

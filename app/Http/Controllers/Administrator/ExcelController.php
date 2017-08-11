@@ -805,9 +805,167 @@ class ExcelController extends Controller
 
         return Excel::create('PH-MDRTB KULTUR SAMPLE REPORT', function($excel) {
 
-            
+            $excel->sheet('POSITIVE', function($sheet) {
 
-        });
+                $listPeriksa = Periksa::all()
+                                ->where('hasil', 'TB Positif')
+                                ->where('jns_sampel', 'Kultur')
+                                ->sortBy('idtb');
+
+    			$dataRow = 5;
+
+    			$sheet->setPaperSize(5);
+    			$sheet->setOrientation('landscape');
+    			$sheet->setPageMargin(0.25);
+
+    			$sheet->setFreeze('A5');
+
+    			$sheet->mergeCells('A1:O1');
+    			$sheet->mergeCells('A2:O2');
+
+    			$sheet->cell('A1', function($cell) {
+    				$cell->setValue('PEER HEALTH MDRTB KULTUR-POSITIVE SAMPLE REPORT');
+    				$cell->setFontSize(12);
+    				$cell->setFontWeight('bold');
+    				$cell->setAlignment('center');
+    			});
+
+    			$sheet->cell('A2', function($cell) {
+    				$cell->setValue('Research Conducted by Dr. dr. Andani Eka Putra, M.Sc');
+    				$cell->setFontSize(10);
+    				$cell->setFontWeight('bold');
+    				$cell->setAlignment('center');
+    			});
+
+    			$sheet->appendRow(4, array(
+    				'NO', 'IDTB', 'IDPP', 'NAMA PASIEN', 'GENDER', 'UMUR', 'JNS INSTANSI', 'NAMA INSTANSI', 'PEMERIKSAAN KE', 'TGL MASUK', 'TGL PERIKSA', 'JNS SAMPEL', 'RESISTENSI', 'HASIL', 'RIFF'
+    			));
+
+                $nomor = 1;
+
+    			foreach ($listPeriksa as $key => $value) {
+    				
+    				$sheet->cell('A'.$dataRow, function($cell) use($nomor) { $cell->setValue($nomor); });
+    				$sheet->cell('B'.$dataRow, function($cell) use($value) { $cell->setValue($value->idtb); });
+    				$sheet->cell('C'.$dataRow, function($cell) use($value) { $cell->setValue($value->idpp); });
+    				$sheet->cell('D'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper(isset($value->pasien->nama_pasien)?$value->pasien->nama_pasien:"")); });
+    				$sheet->cell('E'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper(isset($value->pasien->sex)?$value->pasien->sex:"")); });
+    				$sheet->cell('F'.$dataRow, function($cell) use($value) { $cell->setValue(isset($value->pasien->umur)?$value->pasien->umur:""); });
+    				$sheet->cell('G'.$dataRow, function($cell) use($value) { $cell->setValue(isset($value->pasien->instansi->jenisinstansi->nama_jenis_instansi)?$value->pasien->instansi->jenisinstansi->nama_jenis_instansi:""); });
+    				$sheet->cell('H'.$dataRow, function($cell) use($value) { $cell->setValue(isset($value->pasien->instansi->nama_instansi)?$value->pasien->instansi->nama_instansi:""); });
+    				$sheet->cell('I'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->pemeriksaan_ke)); });
+    				$sheet->cell('J'.$dataRow, function($cell) use($value) { $cell->setValue($value->tgl_masuk_sampel->format('d-m-Y')); });
+    				$sheet->cell('K'.$dataRow, function($cell) use($value) { $cell->setValue($value->tgl_periksa->format('d-m-Y')); });
+    				$sheet->cell('L'.$dataRow, function($cell) use($value) { $cell->setValue($value->jns_sampel); });
+    				$sheet->cell('M'.$dataRow, function($cell) use($value) { $cell->setValue($value->jns_resistensi); });
+    				$sheet->cell('N'.$dataRow, function($cell) use($value) { $cell->setValue($value->hasil); });
+    				$sheet->cell('O'.$dataRow, function($cell) use($value) { $cell->setValue($value->rif); });
+
+                    $nomor = $nomor + 1;
+    				$dataRow = $dataRow + 1;
+
+    			}
+
+    			$sheet->cells('A4:O4', function($cells) {
+    				$cells->setAlignment('center');
+    				$cells->setValignment('center');
+    				$cells->setFontWeight('bold');
+    				$cells->setFontSize(9);
+    			});
+
+    			$sheet->cells('A5:O'.($dataRow-1), function($cells) {
+    				$cells->setAlignment('left');
+    				$cells->setValignment('center');
+    				// $cells->setFontWeight('bold');
+    				$cells->setFontSize(8);
+    			});
+
+    			$sheet->setAutoSize(true);
+    			$sheet->setBorder('A4:O'.($dataRow-1), 'thin');
+
+            });
+
+            $excel->sheet('NEGATIVE', function($sheet) {
+
+                $listPeriksa = Periksa::all()
+                                ->where('hasil', 'TB Negatif')
+                                ->where('jns_sampel', 'Kultur')
+                                ->sortBy('idtb');
+
+    			$dataRow = 5;
+
+    			$sheet->setPaperSize(5);
+    			$sheet->setOrientation('landscape');
+    			$sheet->setPageMargin(0.25);
+
+    			$sheet->setFreeze('A5');
+
+    			$sheet->mergeCells('A1:O1');
+    			$sheet->mergeCells('A2:O2');
+
+    			$sheet->cell('A1', function($cell) {
+    				$cell->setValue('PEER HEALTH MDRTB KULTUR-NEGATIVE SAMPLE REPORT');
+    				$cell->setFontSize(12);
+    				$cell->setFontWeight('bold');
+    				$cell->setAlignment('center');
+    			});
+
+    			$sheet->cell('A2', function($cell) {
+    				$cell->setValue('Research Conducted by Dr. dr. Andani Eka Putra, M.Sc');
+    				$cell->setFontSize(10);
+    				$cell->setFontWeight('bold');
+    				$cell->setAlignment('center');
+    			});
+
+    			$sheet->appendRow(4, array(
+    				'NO', 'IDTB', 'IDPP', 'NAMA PASIEN', 'GENDER', 'UMUR', 'JNS INSTANSI', 'NAMA INSTANSI', 'PEMERIKSAAN KE', 'TGL MASUK', 'TGL PERIKSA', 'JNS SAMPEL', 'RESISTENSI', 'HASIL', 'RIFF'
+    			));
+
+                $nomor = 1;
+
+    			foreach ($listPeriksa as $key => $value) {
+    				
+    				$sheet->cell('A'.$dataRow, function($cell) use($nomor) { $cell->setValue($nomor); });
+    				$sheet->cell('B'.$dataRow, function($cell) use($value) { $cell->setValue($value->idtb); });
+    				$sheet->cell('C'.$dataRow, function($cell) use($value) { $cell->setValue($value->idpp); });
+    				$sheet->cell('D'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper(isset($value->pasien->nama_pasien)?$value->pasien->nama_pasien:"")); });
+    				$sheet->cell('E'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper(isset($value->pasien->sex)?$value->pasien->sex:"")); });
+    				$sheet->cell('F'.$dataRow, function($cell) use($value) { $cell->setValue(isset($value->pasien->umur)?$value->pasien->umur:""); });
+    				$sheet->cell('G'.$dataRow, function($cell) use($value) { $cell->setValue(isset($value->pasien->instansi->jenisinstansi->nama_jenis_instansi)?$value->pasien->instansi->jenisinstansi->nama_jenis_instansi:""); });
+    				$sheet->cell('H'.$dataRow, function($cell) use($value) { $cell->setValue(isset($value->pasien->instansi->nama_instansi)?$value->pasien->instansi->nama_instansi:""); });
+    				$sheet->cell('I'.$dataRow, function($cell) use($value) { $cell->setValue(strtoupper($value->pemeriksaan_ke)); });
+    				$sheet->cell('J'.$dataRow, function($cell) use($value) { $cell->setValue($value->tgl_masuk_sampel->format('d-m-Y')); });
+    				$sheet->cell('K'.$dataRow, function($cell) use($value) { $cell->setValue($value->tgl_periksa->format('d-m-Y')); });
+    				$sheet->cell('L'.$dataRow, function($cell) use($value) { $cell->setValue($value->jns_sampel); });
+    				$sheet->cell('M'.$dataRow, function($cell) use($value) { $cell->setValue($value->jns_resistensi); });
+    				$sheet->cell('N'.$dataRow, function($cell) use($value) { $cell->setValue($value->hasil); });
+    				$sheet->cell('O'.$dataRow, function($cell) use($value) { $cell->setValue($value->rif); });
+
+                    $nomor = $nomor + 1;
+    				$dataRow = $dataRow + 1;
+
+    			}
+
+    			$sheet->cells('A4:O4', function($cells) {
+    				$cells->setAlignment('center');
+    				$cells->setValignment('center');
+    				$cells->setFontWeight('bold');
+    				$cells->setFontSize(9);
+    			});
+
+    			$sheet->cells('A5:O'.($dataRow-1), function($cells) {
+    				$cells->setAlignment('left');
+    				$cells->setValignment('center');
+    				// $cells->setFontWeight('bold');
+    				$cells->setFontSize(8);
+    			});
+
+    			$sheet->setAutoSize(true);
+    			$sheet->setBorder('A4:O'.($dataRow-1), 'thin');
+
+            });
+
+        })->download('xls');
 
     }
 
